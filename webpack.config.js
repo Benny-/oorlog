@@ -12,12 +12,18 @@ module.exports = {
     // This may be an array. It will result in many output files.
     entry: './src/main.ts',
 
-    // What files webpack will manage
     resolve: {
-        extensions: ['.js', '.ts', '.tsx']
+        extensions: [
+            '.wasm',
+            '.mjs',
+            '.js',
+            '.json',
+            '.ts',
+            '.tsx',
+        ],
     },
 
-    // Make errors mor clear
+    // Make errors more clear
     devtool: 'inline-source-map',
 
     // Configure output folder and file
@@ -30,20 +36,37 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'ts-loader'
-            }
-        ]
+                loader: 'ts-loader',
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ],
+            },
+            {
+                test: /\.(png|svg|jpg|gif)$/,
+                use: [
+                  {
+                    loader: 'file-loader',
+                    options: {
+
+                    },
+                  },
+                ],
+            },
+        ],
     },
 
     devServer: {
-        contentBase: './dist'
+        contentBase: './dist',
     },
-
 
     plugins: [
         new CleanWebpackPlugin([distDir]),
         new HtmlWebpackPlugin({
-            template: 'src/index.html'
-        })
-    ]
+            template: 'src/index.html',
+        }),
+    ],
 };
