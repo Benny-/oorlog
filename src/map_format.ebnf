@@ -1,0 +1,54 @@
+antijoy_map         ::= difficulty WHITESPACE levelSize WHITESPACE playersNumber WHITESPACE colorNumber WHITESPACE? unknown* "/" tile*
+
+/*
+In W3C's EBNF notation
+
+http://menduz.com/ebnf-highlighter/
+
+Example: of an antijoy map:
+1 4 1 7/21 13 7 0 0 0 10#22 13 7 0 0 0 10#21 14 7 0 0 0 10
+*/
+
+difficulty          ::= number
+levelSize           ::= number
+playersNumber       ::= number
+colorNumber         ::= number
+
+tile                ::= index1 WHITESPACE index2 WHITESPACE colorIndex WHITESPACE objectInside WHITESPACE unitStrength WHITESPACE unitReadyToMove WHITESPACE money WHITESPACE* unknown* "#"?
+
+/*
+index1 == vertical position
+index2 == horizontal position
+Origin is left bottom.
+*/
+
+index1              ::= number
+index2              ::= number
+colorIndex          ::= neutral_lands | number
+objectInside        ::= nothing | pine | palm | town | tower | grave | farm | strong_tower
+unitStrength        ::= number
+unitReadyToMove     ::= can_move | can_not_move
+money               ::= number /* Is always 10 for neutral */
+
+nothing             ::= "0"
+pine                ::= "1"
+palm                ::= "2"
+town                ::= "3"
+tower               ::= "4"
+grave               ::= "5"
+farm                ::= "6"
+strong_tower        ::= "7"
+
+neutral_lands       ::= "7"
+
+can_move            ::= "1"
+can_not_move        ::= "0"
+
+DIGIT_MINUS_ZERO    ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" 
+DIGIT               ::= "0" | DIGIT_MINUS_ZERO 
+number              ::= (DIGIT_MINUS_ZERO DIGIT*) | "0" 
+
+LETTER              ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+word                ::= LETTER*
+unknown             ::= (number | word) WHITESPACE?
+WHITESPACE          ::= " "*

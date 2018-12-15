@@ -1,9 +1,14 @@
 import * as PIXI from 'pixi.js'
-import './code/HexagonTile'
+import { Grammars } from 'ebnf'
 
+import './code/HexagonTile'
 import './css/index.css';
 
-let body = document.body
+const mapGrammer = require('./map_format.ebnf')
+let mapParser = new Grammars.W3C.Parser(mapGrammer, {});
+
+const renderArea = document.querySelector(".render-area");
+const uiOverlay = document.querySelector(".ui-overlay");
 
 const loadTextures = async (images: Array<String>) => {
     let promise = new Promise((resolve, reject) => {
@@ -34,15 +39,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         app.renderer.resize(window.innerWidth, window.innerHeight)
     })
 
-    body.appendChild(app.renderer.view)
+    renderArea.appendChild(app.renderer.view)
 
     const textures = await loadTextures([
         require('./textures/hexagon.png'),
     ])
 
     const hexagonTexture = textures[0]
-    console.log(hexagonTexture)
-    const sprite = new PIXI.Sprite(hexagonTexture)
-    app.stage.addChild(sprite);
+    {
+        const sprite = new PIXI.Sprite(hexagonTexture)
+        sprite.width = 32
+        sprite.height = 32
+        sprite.x = 0
+        sprite.y = 0
+        app.stage.addChild(sprite);
+    }
+    {
+        const sprite = new PIXI.Sprite(hexagonTexture)
+        sprite.width = 32
+        sprite.height = 32
+        sprite.x = 32
+        sprite.y = 0
+        app.stage.addChild(sprite);
+    }
+    {
+        const sprite = new PIXI.Sprite(hexagonTexture)
+        sprite.width = 32
+        sprite.height = 32
+        sprite.x = 32
+        sprite.y = 32
+        app.stage.addChild(sprite);
+    }
 
 }, false)

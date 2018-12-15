@@ -46,6 +46,10 @@ module.exports = {
                 ],
             },
             {
+                test: /\.(txt|ebnf)$/,
+                use: 'raw-loader'
+            },
+            {
                 test: /\.(png|svg|jpg|gif)$/,
                 use: [
                   {
