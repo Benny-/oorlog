@@ -1,6 +1,6 @@
 # Oorlog
 
-A tile based game. Conquer lands and expands you terrectory.
+A tile based game. Conquer lands and expands you territory.
 
 #### Requirements
 
