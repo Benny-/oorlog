@@ -33,13 +33,17 @@ import * as PIXI from 'pixi.js'
 import { Grammars } from 'ebnf'
 
 import './code/HexagonTile'
-import './css/index.css';
+import './css/index.css'
+import { AssertionError } from 'assert';
 
 const mapGrammer = require('./map_format.ebnf')
-let mapParser = new Grammars.W3C.Parser(mapGrammer, {});
+const mapParser = new Grammars.W3C.Parser(mapGrammer, {})
 
-const renderArea = document.querySelector(".render-area");
-const uiOverlay = document.querySelector(".ui-overlay");
+const mapHoneycomb = require('./maps/honeycomb.txt') // A nice small testmap
+const mapSquid = require('./maps/squid.txt')
+
+const renderArea = document.querySelector(".render-area")
+const uiOverlay = document.querySelector(".ui-overlay")
 
 const loadTextures = async (images: Array<String>) => {
     let promise = new Promise((resolve, reject) => {
@@ -75,31 +79,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     const textures = await loadTextures([
         require('./textures/hexagon.png'),
     ])
-
     const hexagonTexture = textures[0]
-    {
-        const sprite = new PIXI.Sprite(hexagonTexture)
-        sprite.width = 32
-        sprite.height = 32
-        sprite.x = 0
-        sprite.y = 0
-        app.stage.addChild(sprite);
-    }
-    {
-        const sprite = new PIXI.Sprite(hexagonTexture)
-        sprite.width = 32
-        sprite.height = 32
-        sprite.x = 32
-        sprite.y = 0
-        app.stage.addChild(sprite);
-    }
-    {
-        const sprite = new PIXI.Sprite(hexagonTexture)
-        sprite.width = 32
-        sprite.height = 32
-        sprite.x = 32
-        sprite.y = 32
-        app.stage.addChild(sprite);
-    }
+    
+    const ast = mapParser.getAST(mapSquid)
+
+    console.assert(ast.type == 'map')
+    let lowestX = Infinity
+    let hihestX = -Infinity
+    let lowestY = Infinity
+    let hihestY = -Infinity
+    ast.children.forEach((child) => {
+        if(child.type == 'tile') {
+            const sprite = new PIXI.Sprite(hexagonTexture)
+            sprite.width = 32
+            sprite.height = 32
+            sprite.anchor.x = 0.5;
+            sprite.anchor.y = 0.5;
+            child.children.forEach((child) => {
+                if(child.type == 'index1') {
+                    sprite.y = 32 * -child.text
+                } else if(child.type == 'index2') {
+                    sprite.x = 32 * +child.text
+                } else if(child.type == 'colorIndex') {
+                    
+                } else if(child.type == 'objectInside') {
+                    
+                } else if(child.type == 'unitStrength') {
+                    
+                } else if(child.type == 'unitReadyToMove') {
+                    
+                } else if(child.type == 'money') {
+                    
+                }
+            })
+            sprite.y = sprite.y - sprite.x / 2
+            app.stage.addChild(sprite)
+        }
+    })
+
+    app.stage.children.forEach(sprite => {
+        lowestY = Math.min(sprite.y, lowestY)
+        hihestY = Math.max(sprite.y, hihestY)
+
+        lowestX = Math.min(sprite.x, lowestX)
+        hihestX = Math.max(sprite.x, hihestX)
+    });
+
+    const centerX = lowestX + (hihestX - lowestX) / 2
+    const centerY = lowestY + (hihestY - lowestY) / 2
+
+    // Makes sure we are viewing the center of all viewable items
+    app.stage.x = -centerX + app.view.width / 2
+    app.stage.y = -centerY + app.view.height / 2
 
 }, false)
