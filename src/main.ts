@@ -32,32 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import * as PIXI from 'pixi.js'
 import { Grammars } from 'ebnf'
 
-import './code/HexagonTile'
+import HexagonGame from './game/hexagon/HexagonGame'
+import HexagonGameInterface from './gameInterface/hexagon/HexagonGameInterface'
 import './css/index.css'
-import { AssertionError } from 'assert';
 
-const mapGrammer = require('./map_format.ebnf')
-const mapParser = new Grammars.W3C.Parser(mapGrammer, {})
+const mapTrio = require('./game/hexagon/maps/3tiles.txt') // Just 3 tiles
+const southeast_to_northwest = require('./game/hexagon/maps/southeast_to_northwest.txt')
+const southwest_to_northeast = require('./game/hexagon/maps/southwest_to_northeast.txt')
+const mapHoneycomb = require('./game/hexagon/maps/honeycomb.txt') // A nice small testmap.
+const mapCircles = require('./game/hexagon/maps/circles.txt')
+const mapSquid = require('./game/hexagon/maps/squid.txt') // A bigger, more complex map.
+const mapGrith = require('./game/hexagon/maps/grith.txt')
 
-const mapHoneycomb = require('./maps/honeycomb.txt') // A nice small testmap
-const mapSquid = require('./maps/squid.txt')
+const renderArea = document.querySelector(".render-area") as Element
+const uiOverlay = document.querySelector(".ui-overlay") as Element
 
-const renderArea = document.querySelector(".render-area")
-const uiOverlay = document.querySelector(".ui-overlay")
-
-const loadTextures = async (images: Array<String>) => {
-    let promise = new Promise((resolve, reject) => {
-        let loader =PIXI.loader
-            .add(images)
-            .load(resolve)
-    })
-    await promise
-    const textures = images.map((elm: string) => PIXI.loader.resources[elm].texture)
-    textures.forEach(element => {
-        console.assert(element != null)
-    });
-    return textures
-}
+console.assert(renderArea)
+console.assert(uiOverlay)
 
 document.addEventListener('DOMContentLoaded', async () => {
     let app : PIXI.Application = new PIXI.Application(
@@ -73,63 +64,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('resize', (e) => {
         app.renderer.resize(window.innerWidth, window.innerHeight)
     })
-
-    renderArea.appendChild(app.renderer.view)
-
-    const textures = await loadTextures([
-        require('./textures/hexagon.png'),
-    ])
-    const hexagonTexture = textures[0]
     
-    const ast = mapParser.getAST(mapSquid)
-
-    console.assert(ast.type == 'map')
-    let lowestX = Infinity
-    let hihestX = -Infinity
-    let lowestY = Infinity
-    let hihestY = -Infinity
-    ast.children.forEach((child) => {
-        if(child.type == 'tile') {
-            const sprite = new PIXI.Sprite(hexagonTexture)
-            sprite.width = 32
-            sprite.height = 32
-            sprite.anchor.x = 0.5;
-            sprite.anchor.y = 0.5;
-            child.children.forEach((child) => {
-                if(child.type == 'index1') {
-                    sprite.y = 32 * -child.text
-                } else if(child.type == 'index2') {
-                    sprite.x = 32 * +child.text
-                } else if(child.type == 'colorIndex') {
-                    
-                } else if(child.type == 'objectInside') {
-                    
-                } else if(child.type == 'unitStrength') {
-                    
-                } else if(child.type == 'unitReadyToMove') {
-                    
-                } else if(child.type == 'money') {
-                    
-                }
-            })
-            sprite.y = sprite.y - sprite.x / 2
-            app.stage.addChild(sprite)
-        }
-    })
-
-    app.stage.children.forEach(sprite => {
-        lowestY = Math.min(sprite.y, lowestY)
-        hihestY = Math.max(sprite.y, hihestY)
-
-        lowestX = Math.min(sprite.x, lowestX)
-        hihestX = Math.max(sprite.x, hihestX)
-    });
-
-    const centerX = lowestX + (hihestX - lowestX) / 2
-    const centerY = lowestY + (hihestY - lowestY) / 2
-
-    // Makes sure we are viewing the center of all viewable items
-    app.stage.x = -centerX + app.view.width / 2
-    app.stage.y = -centerY + app.view.height / 2
+    renderArea.appendChild(app.renderer.view)
+    
+    const hexagonGame = new HexagonGame()
+    hexagonGame.importYoymap(mapSquid)
+    const hexagonGameInterface = new HexagonGameInterface(hexagonGame, app.stage)
+    hexagonGameInterface.recenterStage(app.view)
 
 }, false)

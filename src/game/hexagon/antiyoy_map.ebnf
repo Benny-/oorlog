@@ -1,4 +1,4 @@
-map         ::= difficulty WHITESPACE levelSize WHITESPACE playersNumber WHITESPACE colorNumber WHITESPACE? unknown* "/" tile*
+map                 ::= difficulty WHITESPACE levelSize WHITESPACE playersNumber WHITESPACE colorNumber WHITESPACE? unknown* "/" tile*
 
 /*
 In W3C's EBNF notation
