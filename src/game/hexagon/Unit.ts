@@ -30,49 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import * as PIXI from 'pixi.js'
+import Tile from '../Tile'
+import ItemOnTile from '../ItemOnTile'
 
-import Game from '../game/Game'
-import Tile from '../game/Tile'
+abstract class Unit<T extends Tile> extends ItemOnTile<T> {
 
-export abstract class PixiGameInterface<G extends Game<Tile>> {
+    power: number
 
-    game: G;
-    stage: PIXI.Container;
-
-    constructor(game: G, stage: PIXI.Container) {
-        this.game = game;
-        this.stage = stage;
-    }
-
-    recenterStage(view: HTMLCanvasElement) {
-        let lowestX = Infinity
-        let highestX = -Infinity
-        let lowestY = Infinity
-        let highestY = -Infinity
-
-        this.stage.children.forEach(sprite => {
-            lowestY = Math.min(sprite.y, lowestY)
-            highestY = Math.max(sprite.y, highestY)
-    
-            lowestX = Math.min(sprite.x, lowestX)
-            highestX = Math.max(sprite.x, highestX)
-        });
-
-        const centerX = lowestX + (highestX - lowestX) / 2
-        const centerY = lowestY + (highestY - lowestY) / 2
-
-        // Makes sure we are viewing the center of all viewable items
-        this.stage.x = -centerX + view.width / 2
-        this.stage.y = -centerY + view.height / 2
-
-        return {
-            lowestX,
-            highestX,
-            lowestY,
-            highestY,
-        }
+    constructor(id: string, tile: T, power: number = 1) {
+        super(id, tile)
+        this.power = power
     }
 }
 
-export default PixiGameInterface
+export default Unit

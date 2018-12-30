@@ -37,14 +37,27 @@ import * as Color from 'color'
 import Player from '../Player'
 import Game from '../Game'
 import HexagonTile from './HexagonTile'
+import Hut from './Hut'
+import TownHall from './TownHall'
+import Unit from './Unit'
+import Tower from './Tower';
 
 const mapGrammer = require('./antiyoy_map.ebnf')
 const mapParser = new Grammars.W3C.Parser(mapGrammer, {})
 
 class HexagonGame extends Game<HexagonTile> {
 
+    huts: Map<string, Hut<HexagonTile>>
+    townhalls: Map<string, TownHall<HexagonTile>>
+    units: Map<string, Unit<HexagonTile>>
+    towers: Map<string, Tower<HexagonTile>>
+
     constructor() {
         super()
+        this.huts = new Map<string, Hut<HexagonTile>>()
+        this.townhalls = new Map<string, TownHall<HexagonTile>>()
+        this.units = new Map<string, Unit<HexagonTile>>()
+        this.towers = new Map<string, Tower<HexagonTile>>()
     }
 
     importYoymap(map: string) {

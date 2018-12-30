@@ -29,7 +29,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 import * as PIXI from 'pixi.js'
+import * as Viewport from 'pixi-viewport'
 import { Grammars } from 'ebnf'
 
 import HexagonGame from './game/hexagon/HexagonGame'
@@ -51,7 +53,7 @@ console.assert(renderArea)
 console.assert(uiOverlay)
 
 document.addEventListener('DOMContentLoaded', async () => {
-    let app : PIXI.Application = new PIXI.Application(
+    const app : PIXI.Application = new PIXI.Application(
         window.innerWidth,
         window.innerHeight,
         {
@@ -60,16 +62,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             resolution: 1,
             backgroundColor: 0x061639
         })
+    
+    const viewport = new Viewport({
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        interaction: app.renderer.plugins.interaction
+    })
 
+    app.stage.addChild(viewport)
+
+    viewport
+        .drag()
+        .pinch()
+        .wheel()
+        .decelerate()
+    
     window.addEventListener('resize', (e) => {
         app.renderer.resize(window.innerWidth, window.innerHeight)
     })
     
     renderArea.appendChild(app.renderer.view)
-    
+
     const hexagonGame = new HexagonGame()
     hexagonGame.importYoymap(mapSquid)
-    const hexagonGameInterface = new HexagonGameInterface(hexagonGame, app.stage)
-    hexagonGameInterface.recenterStage(app.view)
+    const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport)
+    const {lowestX, highestX, lowestY, highestY} = hexagonGameInterface.recenterStage(app.view)
 
 }, false)
