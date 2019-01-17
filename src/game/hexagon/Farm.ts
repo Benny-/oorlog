@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import Tile from '../Tile'
 import ItemOnTile from '../ItemOnTile'
 
-abstract class Hut<T extends Tile> extends ItemOnTile<T> {
+class Farm<T extends Tile> extends ItemOnTile<T> {
 
     constructor(id: string, tile: T) {
         super(id, tile)
     }
 }
 
-export default Hut
+export default Farm

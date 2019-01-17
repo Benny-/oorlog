@@ -33,13 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import Tile from '../Tile'
 import ItemOnTile from '../ItemOnTile'
 
-abstract class Tree<T extends Tile> extends ItemOnTile<T> {
+class Tree<T extends Tile> extends ItemOnTile<T> {
 
-    power: number
+    name: string
 
-    constructor(id: string, tile: T, power: number = 1) {
+    constructor(id: string, tile: T, name: string = 'pine') {
         super(id, tile)
-        this.power = power
+        this.name = name
     }
 }
 

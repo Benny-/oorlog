@@ -42,7 +42,7 @@ class HexagonTile extends Tile{
     south: HexagonTile | null
     northWest: HexagonTile | null
 
-    constructor(id: string, owner: Player | null) {
+    constructor(id: string, owner: Player | null = null) {
         super(id, owner)
     }
 

@@ -36,33 +36,47 @@ import * as Color from 'color'
 
 import Player from '../Player'
 import Game from '../Game'
+import Farm from './Farm'
+import Grave from './Grave'
 import HexagonTile from './HexagonTile'
-import Hut from './Hut'
-import TownHall from './TownHall'
-import Unit from './Unit'
 import Tower from './Tower';
+import TownHall from './TownHall'
+import Tree from './Tree';
+import Unit from './Unit'
+import { stringify } from 'querystring';
 
 const mapGrammer = require('./antiyoy_map.ebnf')
 const mapParser = new Grammars.W3C.Parser(mapGrammer, {})
 
 class HexagonGame extends Game<HexagonTile> {
 
-    huts: Map<string, Hut<HexagonTile>>
-    townhalls: Map<string, TownHall<HexagonTile>>
-    units: Map<string, Unit<HexagonTile>>
+    farms: Map<string, Farm<HexagonTile>>
+    graves: Map<string, Grave<HexagonTile>>
     towers: Map<string, Tower<HexagonTile>>
+    townhalls: Map<string, TownHall<HexagonTile>>
+    trees: Map<string, Tree<HexagonTile>>
+    units: Map<string, Unit<HexagonTile>>
 
     constructor() {
         super()
-        this.huts = new Map<string, Hut<HexagonTile>>()
-        this.townhalls = new Map<string, TownHall<HexagonTile>>()
-        this.units = new Map<string, Unit<HexagonTile>>()
+        this.farms = new Map<string, Farm<HexagonTile>>()
+        this.graves = new Map<string, Grave<HexagonTile>>()
         this.towers = new Map<string, Tower<HexagonTile>>()
+        this.townhalls = new Map<string, TownHall<HexagonTile>>()
+        this.trees = new Map<string, Tree<HexagonTile>>()
+        this.units = new Map<string, Unit<HexagonTile>>()
     }
 
     importYoymap(map: string) {
-        const hexMap = new Map<string, HexagonTile>()
+        const hexMap    = new Map<string, HexagonTile>()
         const playerMap = new Map<number, Player>();
+        const farms     : Farm<HexagonTile>[]       = []
+        const graves    : Grave<HexagonTile>[]      = []
+        const towers    : Tower<HexagonTile>[]      = []
+        const townhalls : TownHall<HexagonTile>[]   = []
+        const trees     : Tree<HexagonTile>[]       = []
+        const units     : Unit<HexagonTile>[]       = []
+        
         const ast = mapParser.getAST(map)
         let i = 1
 
@@ -71,6 +85,8 @@ class HexagonGame extends Game<HexagonTile> {
             if(child.type == 'tile') {
                 const position = new PIXI.Point()
                 let owner: Player | null = null
+                const hexagonTile = new HexagonTile("" + i++)
+                let objectsInside = 0
                 child.children.forEach((child) => {
                     if(child.type == 'index1') {
                         position.y = +child.text
@@ -84,17 +100,21 @@ class HexagonGame extends Game<HexagonTile> {
                             const newPlayer = new Player(child.text)
                             playerMap.set(colorIndex, newPlayer)
                             switch(colorIndex) {
-                                case 1:
+                                case 0:
                                     newPlayer.color = Color('#60b55c')
                                 break
 
-                                case 2:
+                                case 1:
                                     newPlayer.color = Color('#b55c77')
+                                break
+
+                                case 2:
+                                    newPlayer.color = Color('#735cb5')
                                 break
 
                                 case 3:
                                     newPlayer.color = Color('#5cb5b0')
-                                break
+                                break;
 
                                 case 4:
                                     newPlayer.color = Color('#b5bc64')
@@ -115,16 +135,84 @@ class HexagonGame extends Game<HexagonTile> {
                             owner = newPlayer
                         }
                     } else if(child.type == 'objectInside') {
-                        
+                        console.assert(child.children.length == 1)
+                        const objectInside = child.children[0]
+                        if(objectsInside >= 1) {
+                            console.warn(objectsInside == 1, `Can't have more then 1 unit or object on tile`, hexagonTile)
+                        } else {
+                            let hasObject = true
+                            switch(objectInside.type) {
+                                case 'pine':
+                                {
+                                    const tree = new Tree<HexagonTile>("" + i++, hexagonTile, 'pine')
+                                    trees.push(tree)
+                                }
+                                break;
+    
+                                case 'palm':
+                                {
+                                    const tree = new Tree<HexagonTile>("" + i++, hexagonTile, 'palm')
+                                    trees.push(tree)
+                                }
+                                break;
+    
+                                case 'town':
+                                    const townhall = new TownHall<HexagonTile>("" + i++, hexagonTile)
+                                    townhalls.push(townhall)
+                                break;
+    
+                                case 'tower':
+                                {
+                                    const tower = new Tower<HexagonTile>('' + i++, hexagonTile, 1)
+                                    towers.push(tower)
+                                }
+                                break;
+    
+                                case 'grave':
+                                    const grave = new Grave<HexagonTile>('' + i++, hexagonTile)
+                                    graves.push(grave)
+                                break;
+    
+                                case 'farm':
+                                    const farm = new Farm('' + i++, hexagonTile)
+                                    farms.push(farm)
+                                break;
+    
+                                case 'strong_tower':
+                                {
+                                    const tower = new Tower<HexagonTile>('' + i++, hexagonTile, 2)
+                                    towers.push(tower)
+                                }
+                                break;
+    
+                                default:
+                                    hasObject = false
+                                break;
+                            }
+                            if(hasObject) {
+                                objectsInside++
+                            }
+                        }
+
                     } else if(child.type == 'unitStrength') {
-                        
+                        const unitStrength = +child.text
+                        if(unitStrength > 0) {
+                            if(objectsInside >= 1) {
+                                console.warn(objectsInside == 1, `Can't have more then 1 unit or object on tile`, hexagonTile)
+                            } else {
+                                const unit = new Unit('' + i++, hexagonTile, unitStrength)
+                                units.push(unit)
+                                objectsInside++
+                            }
+                        }
+
                     } else if(child.type == 'unitReadyToMove') {
                         
                     } else if(child.type == 'money') {
                         
                     }
                 })
-                const hexagonTile = new HexagonTile("" + i++, owner)
+                hexagonTile.owner = owner
                 hexagonTile.name = position.x + " " + position.y
                 hexMap.set(position.x + " " + position.y, hexagonTile)
                 console.assert(hexMap.get(position.x + " " + position.y) == hexagonTile)
@@ -165,6 +253,36 @@ class HexagonGame extends Game<HexagonTile> {
         })
         playerMap.forEach((p) => {
             this.addPlayer(p)
+        })
+
+        this.farms.clear()
+        farms.forEach((farm) => {
+            this.farms.set(farm.id, farm)
+        })
+
+        this.graves.clear()
+        graves.forEach((grave) => {
+            this.graves.set(grave.id, grave)
+        })
+
+        this.towers.clear()
+        towers.forEach((tower) => {
+            this.towers.set(tower.id, tower)
+        })
+
+        this.townhalls.clear()
+        townhalls.forEach((townhall) => {
+            this.townhalls.set(townhall.id, townhall)
+        })
+
+        this.trees.clear()
+        trees.forEach((tree) => {
+            this.trees.set(tree.id, tree)
+        })
+
+        this.units.clear()
+        units.forEach((unit) => {
+            this.units.set(unit.id, unit)
         })
     }
 }

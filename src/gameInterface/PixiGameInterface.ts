@@ -57,7 +57,7 @@ export abstract class PixiGameInterface<G extends Game<Tile>> {
     
             lowestX = Math.min(sprite.x, lowestX)
             highestX = Math.max(sprite.x, highestX)
-        });
+        })
 
         const centerX = lowestX + (highestX - lowestX) / 2
         const centerY = lowestY + (highestY - lowestY) / 2

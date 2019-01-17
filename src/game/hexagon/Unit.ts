@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import Tile from '../Tile'
 import ItemOnTile from '../ItemOnTile'
 
-abstract class Unit<T extends Tile> extends ItemOnTile<T> {
+class Unit<T extends Tile> extends ItemOnTile<T> {
 
     power: number
 

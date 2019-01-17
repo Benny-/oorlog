@@ -45,12 +45,27 @@ const mapHoneycomb = require('./game/hexagon/maps/honeycomb.txt') // A nice smal
 const mapCircles = require('./game/hexagon/maps/circles.txt')
 const mapSquid = require('./game/hexagon/maps/squid.txt') // A bigger, more complex map.
 const mapGrith = require('./game/hexagon/maps/grith.txt')
+const mapJust = require('./game/hexagon/maps/Just antijoy map.txt')
 
 const renderArea = document.querySelector(".render-area") as Element
 const uiOverlay = document.querySelector(".ui-overlay") as Element
 
 console.assert(renderArea)
 console.assert(uiOverlay)
+
+const loadTextures = async (images: Array<String>) => {
+    let promise = new Promise((resolve, reject) => {
+        let loader =PIXI.loader
+            .add(images)
+            .load(resolve)
+    })
+    await promise
+    const textures = images.map((elm: string) => PIXI.loader.resources[elm].texture)
+    textures.forEach(element => {
+        console.assert(element != null)
+    });
+    return textures
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const app : PIXI.Application = new PIXI.Application(
@@ -83,9 +98,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     renderArea.appendChild(app.renderer.view)
 
+    const textures = await loadTextures([
+        require('./assets/field_elements/castle.png'),
+        require('./assets/field_elements/farm1.png'),
+        require('./assets/field_elements/farm2.png'),
+        require('./assets/field_elements/farm3.png'),
+        require('./assets/field_elements/grave.png'),
+        require('./assets/field_elements/man0.png'),
+        require('./assets/field_elements/man1.png'),
+        require('./assets/field_elements/man2.png'),
+        require('./assets/field_elements/man3.png'),
+        require('./assets/field_elements/palm.png'),
+        require('./assets/field_elements/pine.png'),
+        require('./assets/field_elements/strong_tower.png'),
+        require('./assets/field_elements/tower.png'),
+    ])
+    const castleTexture = textures[0]
+    const farm1Texture = textures[1]
+    const farm2Texture = textures[2]
+    const farm3Texture = textures[3]
+    const graveTexture = textures[4]
+    const man0Texture = textures[5]
+    const man1Texture = textures[6]
+    const man2Texture = textures[7]
+    const man3Texture = textures[8]
+    const palmTexture = textures[9]
+    const pineTexture = textures[10]
+    const strong_towerTexture = textures[11]
+    const towerTexture = textures[12]
+
     const hexagonGame = new HexagonGame()
-    hexagonGame.importYoymap(mapSquid)
-    const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport)
+    hexagonGame.importYoymap(mapJust)
+    const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport, {
+        castleTexture,
+        farm1Texture,
+        farm2Texture,
+        farm3Texture,
+        graveTexture,
+        man0Texture,
+        man1Texture,
+        man2Texture,
+        man3Texture,
+        palmTexture,
+        pineTexture,
+        strong_towerTexture,
+        towerTexture,
+    })
     const {lowestX, highestX, lowestY, highestY} = hexagonGameInterface.recenterStage(app.view)
 
 }, false)

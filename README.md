@@ -31,4 +31,5 @@ Place build `./dist` files on a webserver and navigate to the page.
 
 #### License
 
-[BSD 3](https://opensource.org/licenses/BSD-3-Clause)
+Everything in `src/assets/field_elements` is [GPL 3](https://opensource.org/licenses/gpl-3.0.html)
+Anything not otherwise specified is [BSD 3](https://opensource.org/licenses/BSD-3-Clause)

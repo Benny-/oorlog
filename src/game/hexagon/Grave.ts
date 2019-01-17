@@ -33,13 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import Tile from '../Tile'
 import ItemOnTile from '../ItemOnTile'
 
-abstract class Grave<T extends Tile> extends ItemOnTile<T> {
+class Grave<T extends Tile> extends ItemOnTile<T> {
 
-    power: number
-
-    constructor(id: string, tile: T, power: number = 1) {
+    constructor(id: string, tile: T) {
         super(id, tile)
-        this.power = power
     }
 }
 

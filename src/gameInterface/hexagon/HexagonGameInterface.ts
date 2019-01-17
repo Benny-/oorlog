@@ -41,9 +41,7 @@ const verticalSpace = 58
 const recursiveAddTiles = (position: PIXI.Point,
                             t: HexagonTile,
                             stage: PIXI.Container,
-                            set: Set<HexagonTile>) => {
-    set.add(t)
-
+                            map: Map<HexagonTile, PIXI.Container>) => {
     const ctx = new PIXI.Graphics()
     ctx.lineStyle(1, 0x000000, 1)
     if(t.owner) {
@@ -63,50 +61,125 @@ const recursiveAddTiles = (position: PIXI.Point,
     ctx.position = position
     stage.addChild(ctx)
 
-    if(t.north && !set.has(t.north)) {
-        recursiveAddTiles(new PIXI.Point(position.x, position.y - verticalSpace), t.north, stage, set)
+    map.set(t, ctx)
+
+    if(t.north && !map.has(t.north)) {
+        recursiveAddTiles(new PIXI.Point(position.x, position.y - verticalSpace), t.north, stage, map)
     }
 
-    if(t.northEast && !set.has(t.northEast)) {
-        recursiveAddTiles(new PIXI.Point(position.x + horizontalSpace, position.y - verticalSpace/2), t.northEast, stage, set)
+    if(t.northEast && !map.has(t.northEast)) {
+        recursiveAddTiles(new PIXI.Point(position.x + horizontalSpace, position.y - verticalSpace/2), t.northEast, stage, map)
     }
 
-    if(t.southEast && !set.has(t.southEast)) {
-        recursiveAddTiles(new PIXI.Point(position.x + horizontalSpace, position.y + verticalSpace/2), t.southEast, stage, set)
+    if(t.southEast && !map.has(t.southEast)) {
+        recursiveAddTiles(new PIXI.Point(position.x + horizontalSpace, position.y + verticalSpace/2), t.southEast, stage, map)
     }
 
-    if(t.south && !set.has(t.south)) {
-        recursiveAddTiles(new PIXI.Point(position.x, position.y + verticalSpace), t.south, stage, set)
+    if(t.south && !map.has(t.south)) {
+        recursiveAddTiles(new PIXI.Point(position.x, position.y + verticalSpace), t.south, stage, map)
     }
 
-    if(t.southWest && !set.has(t.southWest)) {
-        recursiveAddTiles(new PIXI.Point(position.x - horizontalSpace, position.y + verticalSpace/2), t.southWest, stage, set)
+    if(t.southWest && !map.has(t.southWest)) {
+        recursiveAddTiles(new PIXI.Point(position.x - horizontalSpace, position.y + verticalSpace/2), t.southWest, stage, map)
     }
 
-    if(t.northWest && !set.has(t.northWest)) {
-        recursiveAddTiles(new PIXI.Point(position.x - horizontalSpace, position.y - verticalSpace/2), t.northWest, stage, set)
+    if(t.northWest && !map.has(t.northWest)) {
+        recursiveAddTiles(new PIXI.Point(position.x - horizontalSpace, position.y - verticalSpace/2), t.northWest, stage, map)
     }
 }
 
 class HexagonGameInterface extends PixiGameInterface<HexagonGame> {
 
-    constructor(game: HexagonGame, stage: PIXI.Container) {
+    constructor(game: HexagonGame, stage: PIXI.Container, textureMap: { [index:string] : PIXI.Texture }) {
         super(game, stage)
 
-        const set = new Set<HexagonTile>()
+        const map = new Map<HexagonTile, PIXI.Container>()
         let gotFirst = false
         for(let tuple of this.game.tiles) {
             const tile = tuple[1]
-            if(set.has(tile)) {
+            if(map.has(tile)) {
                 console.assert(false, "No code to handle multiple unconnected islands has been written")
                 // On should also wonder if this is something we want to play. A map which can't be conquered
             } else {
                 if(!gotFirst) {
-                    recursiveAddTiles(new PIXI.Point(100, 100), tile, stage, set)
+                    recursiveAddTiles(new PIXI.Point(100, 100), tile, stage, map)
                     gotFirst = true
                 }
             }
         }
+
+        this.game.farms.forEach((farm, id) => {
+            const container = map.get(farm.tile)
+            if(container) {
+                const sprite = new PIXI.Sprite(textureMap.farm1Texture)
+                sprite.scale.x = 0.4
+                sprite.scale.y = 0.4
+                sprite.anchor.x = 0.5;
+                sprite.anchor.y = 0.5;
+                container.addChild(sprite)
+            }
+        })
+
+        this.game.graves.forEach((grave, id) => {
+            const container = map.get(grave.tile)
+            if(container) {
+                const sprite = new PIXI.Sprite(textureMap.graveTexture)
+                sprite.scale.x = 0.6
+                sprite.scale.y = 0.6
+                sprite.anchor.x = 0.5;
+                sprite.anchor.y = 0.5;
+                container.addChild(sprite)
+            }
+        })
+
+        this.game.towers.forEach((tower, id) => {
+            const container = map.get(tower.tile)
+            if(container) {
+                const sprite = new PIXI.Sprite(tower.power == 2 ? textureMap.strong_towerTexture : textureMap.towerTexture)
+                sprite.scale.x = 0.4
+                sprite.scale.y = 0.4
+                sprite.anchor.x = 0.5;
+                sprite.anchor.y = 0.5;
+                container.addChild(sprite)
+            }
+        })
+
+        this.game.townhalls.forEach((townhall, id) => {
+            const container = map.get(townhall.tile)
+            if(container) {
+                const sprite = new PIXI.Sprite(textureMap.castleTexture)
+                sprite.scale.x = 0.4
+                sprite.scale.y = 0.4
+                sprite.anchor.x = 0.5;
+                sprite.anchor.y = 0.5;
+                container.addChild(sprite)
+            }
+        })
+
+        this.game.trees.forEach((tree, id) => {
+            const container = map.get(tree.tile)
+            if(container) {
+                const sprite = new PIXI.Sprite(textureMap[tree.name + 'Texture'])
+                sprite.scale.x = 0.4
+                sprite.scale.y = 0.4
+                sprite.anchor.x = 0.5;
+                sprite.anchor.y = 0.5;
+                container.addChild(sprite)
+            }
+        })
+
+        this.game.units.forEach((unit, id) => {
+            const container = map.get(unit.tile)
+            if(container) {
+                const power = Math.max(Math.min(unit.power, 4), 0)
+                const sprite = new PIXI.Sprite(textureMap['man' + (power - 1) + 'Texture'])
+                sprite.scale.x = 0.3
+                sprite.scale.y = 0.3
+                sprite.anchor.x = 0.5;
+                sprite.anchor.y = 0.5;
+                container.addChild(sprite)
+            }
+        })
     }
 }
 

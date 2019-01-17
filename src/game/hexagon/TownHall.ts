@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import Tile from '../Tile'
 import Tower from './Tower';
 
-abstract class TownHall<T extends Tile> extends Tower<T> {
+class TownHall<T extends Tile> extends Tower<T> {
 
     power: number
 
