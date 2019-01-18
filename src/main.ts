@@ -30,6 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+import * as qs from 'qs'
 import * as PIXI from 'pixi.js'
 import * as Viewport from 'pixi-viewport'
 import { Grammars } from 'ebnf'
@@ -38,20 +39,18 @@ import HexagonGame from './game/hexagon/HexagonGame'
 import HexagonGameInterface from './gameInterface/hexagon/HexagonGameInterface'
 import './css/index.css'
 
-const mapTrio = require('./game/hexagon/maps/3tiles.txt') // Just 3 tiles
-const southeast_to_northwest = require('./game/hexagon/maps/southeast_to_northwest.txt')
-const southwest_to_northeast = require('./game/hexagon/maps/southwest_to_northeast.txt')
-const mapHoneycomb = require('./game/hexagon/maps/honeycomb.txt') // A nice small testmap.
-const mapCircles = require('./game/hexagon/maps/circles.txt')
-const mapSquid = require('./game/hexagon/maps/squid.txt') // A bigger, more complex map.
-const mapGrith = require('./game/hexagon/maps/grith.txt')
-const mapJust = require('./game/hexagon/maps/Just antijoy map.txt')
-
-const renderArea = document.querySelector(".render-area") as Element
-const uiOverlay = document.querySelector(".ui-overlay") as Element
+const renderArea = document.querySelector(".render-area") as HTMLElement
+const uiOverlay = document.querySelector(".ui-overlay") as HTMLElement
+const errorMessage = document.querySelector(".error-message") as HTMLElement
+const form = document.querySelector("form") as HTMLElement
+const urlInput = document.querySelector(".url-input") as HTMLInputElement
+const urlContent = document.querySelector(".url-content") as HTMLTextAreaElement
 
 console.assert(renderArea)
 console.assert(uiOverlay)
+console.assert(form)
+console.assert(urlInput)
+console.assert(urlContent)
 
 const loadTextures = async (images: Array<String>) => {
     let promise = new Promise((resolve, reject) => {
@@ -66,6 +65,12 @@ const loadTextures = async (images: Array<String>) => {
     });
     return textures
 }
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault()
+
+    window.location.href = '?' + urlInput.value
+})
 
 document.addEventListener('DOMContentLoaded', async () => {
     const app : PIXI.Application = new PIXI.Application(
@@ -128,22 +133,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     const towerTexture = textures[12]
 
     const hexagonGame = new HexagonGame()
-    hexagonGame.importYoymap(mapJust)
-    const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport, {
-        castleTexture,
-        farm1Texture,
-        farm2Texture,
-        farm3Texture,
-        graveTexture,
-        man0Texture,
-        man1Texture,
-        man2Texture,
-        man3Texture,
-        palmTexture,
-        pineTexture,
-        strong_towerTexture,
-        towerTexture,
-    })
-    const {lowestX, highestX, lowestY, highestY} = hexagonGameInterface.recenterStage(app.view)
+
+    let queryStr = window.location.search
+    if(queryStr.charAt(0) === '?') {
+        queryStr = queryStr.substr(1)
+    }
+
+    let url = 'https://cors.io/?https://pastebin.com/raw/DhsSPXMU'
+    let text: string = ''
+
+    if(queryStr) {
+        const possibleUrl = qs.parse(queryStr).url
+        if(possibleUrl) {
+            url = '' + possibleUrl
+        } else {
+            url = queryStr
+        }
+    }
+
+    urlInput.value = url
+    
+    try {
+        const response = await window.fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'default',
+            redirect: 'follow',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+        })
+        text = await response.text()
+    } catch(ex) {
+        errorMessage.style.display = ''
+        errorMessage.textContent = 'An error has occured while fetching the game map'
+    }
+
+    urlContent.textContent = text
+
+    if(text) {
+        hexagonGame.importYoymap(text)
+        const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport, {
+            castleTexture,
+            farm1Texture,
+            farm2Texture,
+            farm3Texture,
+            graveTexture,
+            man0Texture,
+            man1Texture,
+            man2Texture,
+            man3Texture,
+            palmTexture,
+            pineTexture,
+            strong_towerTexture,
+            towerTexture,
+        })
+        const {lowestX, highestX, lowestY, highestY} = hexagonGameInterface.recenterStage(app.view)
+    } else {
+        if(errorMessage.style.display != '') {
+            errorMessage.style.display = ''
+            errorMessage.textContent = 'File did not contain any text'
+        }
+    }
 
 }, false)

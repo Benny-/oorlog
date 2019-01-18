@@ -97,13 +97,13 @@ class HexagonGameInterface extends PixiGameInterface<HexagonGame> {
         let gotFirst = false
         for(let tuple of this.game.tiles) {
             const tile = tuple[1]
-            if(map.has(tile)) {
-                console.assert(false, "No code to handle multiple unconnected islands has been written")
-                // On should also wonder if this is something we want to play. A map which can't be conquered
-            } else {
+            if(!map.has(tile)) {
                 if(!gotFirst) {
                     recursiveAddTiles(new PIXI.Point(100, 100), tile, stage, map)
                     gotFirst = true
+                } else {
+                    console.assert(false, "No code to handle multiple unconnected islands has been written")
+                    // On should also wonder if this is something we want to play. A map which can't be conquered
                 }
             }
         }
