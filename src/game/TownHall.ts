@@ -30,17 +30,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import Tile from '../Tile'
-import ItemOnTile from '../ItemOnTile'
+import Tile from './Tile'
+import Tower from './Tower';
 
-abstract class MilitaryForce<T extends Tile> extends ItemOnTile<T> {
+class TownHall<T extends Tile> extends Tower<T> {
 
     power: number
 
-    constructor(id: string, tile: T, power: number = 1) {
+    constructor(id: string, tile: T) {
         super(id, tile)
-        this.power = power
     }
 }
 
-export default MilitaryForce
+export default TownHall

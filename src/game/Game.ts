@@ -32,15 +32,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import Player from './Player'
 import Tile from './Tile'
+import Farm from './Farm'
+import Grave from './Grave'
+import HexagonTile from './hexagon/HexagonTile'
+import Tower from './Tower';
+import TownHall from './TownHall'
+import Tree from './Tree';
+import Unit from './Unit'
 
 abstract class Game<T extends Tile> {
 
     tiles: Map<string, T>
     players: Map<string, Player>
+    farms: Map<string, Farm<HexagonTile>>
+    graves: Map<string, Grave<HexagonTile>>
+    towers: Map<string, Tower<HexagonTile>>
+    townhalls: Map<string, TownHall<HexagonTile>>
+    trees: Map<string, Tree<HexagonTile>>
+    units: Map<string, Unit<HexagonTile>>
 
     constructor() {
         this.tiles = new Map<string, T>()
         this.players = new Map<string, Player>()
+        this.farms = new Map<string, Farm<HexagonTile>>()
+        this.graves = new Map<string, Grave<HexagonTile>>()
+        this.towers = new Map<string, Tower<HexagonTile>>()
+        this.townhalls = new Map<string, TownHall<HexagonTile>>()
+        this.trees = new Map<string, Tree<HexagonTile>>()
+        this.units = new Map<string, Unit<HexagonTile>>()
     }
 
     addTile(t: T) {

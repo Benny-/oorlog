@@ -40,10 +40,10 @@ class SquareGame extends Game<SquareTile> {
     }
 
     /**
-     * TODO: Implement this function and make it accept json, a stringified map or maybe already a full bellum object!
+     * TODO: Implement this function and make it accept json, a stringified map or maybe already a full bellum object
      */
     importBellum() {
-
+        throw new Error('Function not implemented')
     }
 }
 

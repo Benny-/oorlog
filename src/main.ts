@@ -35,6 +35,7 @@ import * as PIXI from 'pixi.js'
 import * as Viewport from 'pixi-viewport'
 import { Grammars } from 'ebnf'
 
+import Room from './game/Room'
 import HexagonGame from './game/hexagon/HexagonGame'
 import HexagonGameInterface from './gameInterface/hexagon/HexagonGameInterface'
 import './css/index.css'
@@ -73,6 +74,7 @@ form.addEventListener('submit', (e) => {
 })
 
 document.addEventListener('DOMContentLoaded', async () => {
+    PIXI.utils.skipHello()
     const app : PIXI.Application = new PIXI.Application(
         window.innerWidth,
         window.innerHeight,
@@ -134,6 +136,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const hexagonGame = new HexagonGame()
 
+    const room = new Room('1')
+    room.game = hexagonGame
+
     let queryStr = window.location.search
     if(queryStr.charAt(0) === '?') {
         queryStr = queryStr.substr(1)
@@ -172,23 +177,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     urlContent.textContent = text
 
     if(text) {
-        hexagonGame.importYoymap(text)
-        const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport, {
-            castleTexture,
-            farm1Texture,
-            farm2Texture,
-            farm3Texture,
-            graveTexture,
-            man0Texture,
-            man1Texture,
-            man2Texture,
-            man3Texture,
-            palmTexture,
-            pineTexture,
-            strong_towerTexture,
-            towerTexture,
-        })
-        const {lowestX, highestX, lowestY, highestY} = hexagonGameInterface.recenterStage(app.view)
+        try {
+            hexagonGame.importYoymap(text)
+            const hexagonGameInterface = new HexagonGameInterface(hexagonGame, viewport, {
+                castleTexture,
+                farm1Texture,
+                farm2Texture,
+                farm3Texture,
+                graveTexture,
+                man0Texture,
+                man1Texture,
+                man2Texture,
+                man3Texture,
+                palmTexture,
+                pineTexture,
+                strong_towerTexture,
+                towerTexture,
+            })
+            const {lowestX, highestX, lowestY, highestY} = hexagonGameInterface.recenterStage(app.view)
+        } catch(ex) {
+            errorMessage.style.display = ''
+            errorMessage.textContent = 'An error has occured while parsing the game map'
+        }
     } else {
         if(errorMessage.style.display != '') {
             errorMessage.style.display = ''

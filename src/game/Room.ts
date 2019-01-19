@@ -30,14 +30,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import Tile from '../Tile'
-import ItemOnTile from '../ItemOnTile'
+import Game from './Game'
+import Tile from './Tile';
 
-class Grave<T extends Tile> extends ItemOnTile<T> {
+/**
+ * A room contains a chat log and sometimes a game. The room can be re-used between game sessions
+ */
+class Room {
 
-    constructor(id: string, tile: T) {
-        super(id, tile)
+    game: Game<Tile>
+
+    constructor(id: string) {
+        
     }
 }
 
-export default Grave
+export default Room

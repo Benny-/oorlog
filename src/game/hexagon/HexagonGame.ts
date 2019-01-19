@@ -36,35 +36,21 @@ import * as Color from 'color'
 
 import Player from '../Player'
 import Game from '../Game'
-import Farm from './Farm'
-import Grave from './Grave'
+import Farm from '../Farm'
+import Grave from '../Grave'
 import HexagonTile from './HexagonTile'
-import Tower from './Tower';
-import TownHall from './TownHall'
-import Tree from './Tree';
-import Unit from './Unit'
-import { stringify } from 'querystring';
+import Tower from '../Tower';
+import TownHall from '../TownHall'
+import Tree from '../Tree';
+import Unit from '../Unit'
 
 const mapGrammer = require('./antiyoy_map.ebnf')
 const mapParser = new Grammars.W3C.Parser(mapGrammer, {})
 
 class HexagonGame extends Game<HexagonTile> {
 
-    farms: Map<string, Farm<HexagonTile>>
-    graves: Map<string, Grave<HexagonTile>>
-    towers: Map<string, Tower<HexagonTile>>
-    townhalls: Map<string, TownHall<HexagonTile>>
-    trees: Map<string, Tree<HexagonTile>>
-    units: Map<string, Unit<HexagonTile>>
-
     constructor() {
         super()
-        this.farms = new Map<string, Farm<HexagonTile>>()
-        this.graves = new Map<string, Grave<HexagonTile>>()
-        this.towers = new Map<string, Tower<HexagonTile>>()
-        this.townhalls = new Map<string, TownHall<HexagonTile>>()
-        this.trees = new Map<string, Tree<HexagonTile>>()
-        this.units = new Map<string, Unit<HexagonTile>>()
     }
 
     importYoymap(map: string) {

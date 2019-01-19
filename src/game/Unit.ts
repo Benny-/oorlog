@@ -30,17 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import Tile from '../Tile'
-import ItemOnTile from '../ItemOnTile'
+import Tile from './Tile'
+import ItemOnTile from './ItemOnTile'
 
-class Tree<T extends Tile> extends ItemOnTile<T> {
+class Unit<T extends Tile> extends ItemOnTile<T> {
 
-    name: string
+    power: number
 
-    constructor(id: string, tile: T, name: string = 'pine') {
+    constructor(id: string, tile: T, power: number = 1) {
         super(id, tile)
-        this.name = name
+        this.power = power
     }
 }
 
-export default Tree
+export default Unit
