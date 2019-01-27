@@ -17,9 +17,21 @@ yarn
 
 #### Run development server
 
+Run all commands in different terminals.
+
 ```sh
-yarn dev
+yarn server-dev # Hot compile and serve client files on a webserver
 ```
+
+```sh
+yarn client-dev # Hot compile server component
+```
+
+```sh
+node './dist/server/server.js' # Run the server component
+```
+
+You'll have to restart the server component if you change any files.
 
 #### Build production
 
@@ -27,7 +39,7 @@ yarn dev
 yarn build
 ```
 
-Place build `./dist` files on a webserver and navigate to the page.
+Place build `./dist/client` files on a webserver, these files should be served using http. Run the file `./dist/server/main_bundle.js` using nodejs.
 
 #### License
 

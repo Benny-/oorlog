@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import * as qs from 'qs'
+import * as socket_io_client from 'socket.io-client'
 import * as PIXI from 'pixi.js'
 import * as Viewport from 'pixi-viewport'
 import { Grammars } from 'ebnf'
@@ -52,6 +53,8 @@ console.assert(uiOverlay)
 console.assert(form)
 console.assert(urlInput)
 console.assert(urlContent)
+
+const socket = process.env.SOCKET_SERVER ? socket_io_client.connect(process.env.SOCKET_SERVER) : socket_io_client.connect()
 
 const loadTextures = async (images: Array<String>) => {
     let promise = new Promise((resolve, reject) => {

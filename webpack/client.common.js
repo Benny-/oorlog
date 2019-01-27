@@ -1,16 +1,18 @@
 'use strict';
 
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const path = require('path');
+var webpack = require('webpack')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const path = require('path')
 
-var distDir = path.resolve(__dirname, 'dist');
+var distDir = path.resolve(__dirname, '..', 'dist', 'client')
 
 module.exports = {
+    target: 'web',
+
     // Entry point : first executed file
     // This may be an array. It will result in many output files.
-    entry: './src/main.ts',
+    entry: './src/client.ts',
 
     resolve: {
         extensions: [
@@ -22,9 +24,6 @@ module.exports = {
             '.tsx',
         ],
     },
-
-    // Make errors more clear
-    devtool: 'inline-source-map',
 
     // Configure output folder and file
     output: {
@@ -64,7 +63,7 @@ module.exports = {
     },
 
     devServer: {
-        contentBase: './dist',
+        contentBase: distDir,
     },
 
     plugins: [
@@ -72,5 +71,8 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
         }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
+        })
     ],
-};
+}
